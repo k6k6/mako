@@ -98,6 +98,7 @@ void init_default_style(struct mako_style *style) {
 #else
 	style->icons = false;
 #endif
+	style->app_icon = NULL;
 	style->max_icon_size = 64;
 	style->icon_path = strdup("");  // hicolor and pixmaps are implicit.
 	style->icon_border_radius = 0;
@@ -154,6 +155,7 @@ void finish_style(struct mako_style *style) {
 	finish_binding(&style->button_bindings.right);
 	finish_binding(&style->touch_binding);
 	finish_binding(&style->notify_binding);
+	free(style->app_icon);
 	free(style->icon_path);
 	free(style->font);
 	free(style->format);
@@ -181,6 +183,7 @@ bool apply_style(struct mako_style *target, const struct mako_style *style) {
 	char *new_font = NULL;
 	char *new_format = NULL;
 	char *new_icon_path = NULL;
+	char *new_app_icon = NULL;
 	char *new_output = NULL;
 
 	if (style->spec.font) {
@@ -221,6 +224,18 @@ bool apply_style(struct mako_style *target, const struct mako_style *style) {
 		}
 	}
 
+	if (style->spec.app_icon && style->app_icon != NULL) {
+		new_app_icon = strdup(style->app_icon);
+		if (new_app_icon == NULL) {
+			free(new_format);
+			free(new_font);
+			free(new_icon_path);
+			free(new_output);
+			fprintf(stderr, "allocation failed\n");
+			return false;
+		}
+	}
+
 	// Now on to actually setting things!
 
 	if (style->spec.width) {
@@ -256,6 +271,12 @@ bool apply_style(struct mako_style *target, const struct mako_style *style) {
 	if (style->spec.icons) {
 		target->icons = style->icons;
 		target->spec.icons = true;
+	}
+
+	if (style->spec.app_icon) {
+		free(target->app_icon);
+		target->app_icon = new_app_icon;
+		target->spec.app_icon = true;
 	}
 
 	if (style->spec.max_icon_size) {
@@ -595,6 +616,9 @@ static bool apply_style_option(struct mako_style *style, const char *name,
 		fprintf(stderr, "Icon support not built in, ignoring icons setting.\n");
 		return true;
 #endif
+	} else if (strcmp(name, "app-icon") == 0 || strcmp(name, "icon") == 0) {
+		free(style->app_icon);
+		return spec->app_icon = !!(style->app_icon = strdup(value));
 	} else if (strcmp(name, "icon-location") == 0) {
 		if (!strcmp(value, "left")) {
 			style->icon_location = MAKO_ICON_LOCATION_LEFT;
@@ -909,6 +933,8 @@ int parse_config_arguments(struct mako_config *config, int argc, char **argv) {
 		{"border-radius", required_argument, 0, 0},
 		{"progress-color", required_argument, 0, 0},
 		{"icons", required_argument, 0, 0},
+		{"app-icon", required_argument, 0, 0},
+		{"icon", required_argument, 0, 0},
 		{"icon-location", required_argument, 0, 0},
 		{"icon-path", required_argument, 0, 0},
 		{"max-icon-size", required_argument, 0, 0},

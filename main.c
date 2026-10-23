@@ -37,6 +37,8 @@ static const char usage[] =
 	"                                      meaning as in CSS.\n"
 	"      --progress-color <color>        Progress indicator color.\n"
 	"      --icons <0|1>                   Show icons in notifications.\n"
+	"      --app-icon <icon>               Override notification app-icon.\n"
+	"      --icon <icon>                   Alias for --app-icon.\n"
 	"      --icon-path <path>[:<path>...]  Icon search path, colon delimited.\n"
 	"      --max-icon-size <px>            Set max size of icons.\n"
 	"      --icon-border-radius <px>       Icon's corner radius.\n"

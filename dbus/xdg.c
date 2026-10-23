@@ -408,10 +408,6 @@ static int handle_notify(sd_bus_message *msg, void *data,
 			handle_notification_timer, notif);
 	}
 
-	if (notif->style.icons) {
-		notif->icon = create_icon(notif);
-	}
-
 	// Now we need to perform the grouping based on the new notification's
 	// group criteria specification (list of criteria which must match). We
 	// don't necessarily want to start with the new notification, as depending

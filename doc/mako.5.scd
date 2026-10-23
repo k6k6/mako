@@ -199,6 +199,32 @@ Supported actions:
 
 	Default: 1
 
+*app-icon*=_icon_
+	Replace the notification's app-icon field with _icon_, which may be an
+	icon name, an absolute file path, or a file:// URI. Icon names are resolved
+	using *icon-path*. *icon* is an alias for this option.
+
+	This overrides client-provided image-path and image-data hints. An empty
+	value clears the icon. It does not enable icons if *icons* is disabled.
+	The changed field is also returned by *makoctl list*.
+
+	Criteria still match the original, client-provided app-icon, so repeated
+	matching does not depend on a previous override. If multiple matching
+	criteria set this option, the last value wins. Removing an override, or
+	disabling its mode, restores the original icon and image hints.
+
+	For example:
+
+	```
+	[app-name="Example"]
+	app-icon=dialog-information
+
+	[app-name="Another application"]
+	icon=/absolute/path/to/icon.png
+	```
+
+	Default: use the notification-provided icon
+
 *max-icon-size*=_px_
 	Set maximum icon size to _px_ pixels.
 

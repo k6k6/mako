@@ -17,6 +17,8 @@ _arguments \
     '--border-size[Border size.]:size:' \
     '--border-color[Border color.]:color:' \
     '--border-radius[Corner radius values, comma separated. Up to four values, with the same meaning as in CSS.]:radius:' \
+    '--app-icon[Override notification app-icon.]:icon:_files' \
+    '--icon[Alias for --app-icon.]:icon:_files' \
     '--icon-border-radius[Icon corner radius value.]:radius:' \
     '--markup[Enable/disable markup.]:markup enabled:(0 1)' \
     '--actions[Applications may request an action to be associated with activating a notification. Disabling this will cause mako to ignore these requests.]:action enabled:(0 1)' \

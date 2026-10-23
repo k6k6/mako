@@ -26,6 +26,7 @@ struct mako_notification {
 
 	struct mako_style style;
 	struct mako_icon *icon;
+	bool icon_initialized;
 
 	uint32_t id;
 	int group_index;
@@ -34,6 +35,7 @@ struct mako_notification {
 
 	char *app_name;
 	char *app_icon;
+	char *original_app_icon; // Saved while a rule overrides app_icon.
 	char *summary;
 	char *body;
 	int32_t requested_timeout;
@@ -80,6 +82,7 @@ typedef char *(*mako_format_func_t)(char variable, bool *markup, void *data);
 
 bool hotspot_at(struct mako_hotspot *hotspot, int32_t x, int32_t y);
 
+bool apply_notification_icon(struct mako_notification *notif);
 void reset_notification(struct mako_notification *notif);
 struct mako_notification *create_notification(struct mako_state *state);
 void destroy_notification(struct mako_notification *notif);

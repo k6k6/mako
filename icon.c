@@ -252,7 +252,8 @@ static char *resolve_icon(struct mako_notification *notif) {
 
 struct mako_icon *create_icon(struct mako_notification *notif) {
 	GdkPixbuf *image = NULL;
-	if (notif->image_data != NULL) {
+	// An explicit rule override takes precedence over client image hints.
+	if (notif->style.app_icon == NULL && notif->image_data != NULL) {
 		image = load_image_data(notif->image_data);
 	}
 

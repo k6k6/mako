@@ -425,6 +425,13 @@ ssize_t apply_each_criteria(struct wl_list *criteria_list,
 		struct mako_notification *notif) {
 	ssize_t match_count = 0;
 
+	// Match the client-provided icon on every pass, not a previous override.
+	// Apply the final override only after all rules have been matched.
+	char *app_icon = notif->app_icon;
+	if (notif->original_app_icon != NULL) {
+		notif->app_icon = notif->original_app_icon;
+	}
+
 	struct mako_criteria *criteria;
 	wl_list_for_each(criteria, criteria_list, link) {
 		if (!match_criteria(criteria, notif)) {
@@ -433,8 +440,13 @@ ssize_t apply_each_criteria(struct wl_list *criteria_list,
 		++match_count;
 
 		if (!apply_style(&notif->style, &criteria->style)) {
+			notif->app_icon = app_icon;
 			return -1;
 		}
+	}
+	notif->app_icon = app_icon;
+	if (!apply_notification_icon(notif)) {
+		return -1;
 	}
 
 	struct mako_surface *surface;

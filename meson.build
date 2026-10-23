@@ -79,25 +79,35 @@ if gdk_pixbuf.found()
 	src_files += 'cairo-pixbuf.c'
 endif
 
+mako_deps = [
+	cairo,
+	epoll,
+	gdk_pixbuf,
+	sdbus,
+	pango,
+	pangocairo,
+	glib,
+	gobject,
+	realtime,
+	wayland_client,
+	wayland_cursor,
+]
+
 executable(
 	'mako',
 	files(src_files) + protocols_src,
-	dependencies: [
-		cairo,
-		epoll,
-		gdk_pixbuf,
-		sdbus,
-		pango,
-		pangocairo,
-		glib,
-		gobject,
-		realtime,
-		wayland_client,
-		wayland_cursor,
-	],
+	dependencies: mako_deps,
 	include_directories: [mako_inc],
 	install: true,
 )
+
+mako_test_sources = []
+foreach source : src_files
+	if source != 'main.c'
+		mako_test_sources += files(source)
+	endif
+endforeach
+subdir('tests')
 
 executable(
 	'makoctl',

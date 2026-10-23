@@ -27,6 +27,44 @@ bool hotspot_at(struct mako_hotspot *hotspot, int32_t x, int32_t y) {
 		y < hotspot->y + hotspot->height;
 }
 
+bool apply_notification_icon(struct mako_notification *notif) {
+	const char *app_icon = notif->style.app_icon;
+	bool overridden = notif->original_app_icon != NULL;
+	bool changed = overridden != (app_icon != NULL);
+
+	if (app_icon != NULL) {
+		changed = changed || strcmp(notif->app_icon, app_icon) != 0;
+		if (changed) {
+			char *new_app_icon = strdup(app_icon);
+			if (new_app_icon == NULL) {
+				fprintf(stderr, "allocation failed\n");
+				return false;
+			}
+			if (overridden) {
+				free(notif->app_icon);
+			} else {
+				notif->original_app_icon = notif->app_icon;
+			}
+			notif->app_icon = new_app_icon;
+		}
+	} else if (overridden) {
+		free(notif->app_icon);
+		notif->app_icon = notif->original_app_icon;
+		notif->original_app_icon = NULL;
+	}
+
+	if (changed) {
+		destroy_icon(notif->icon);
+		notif->icon = NULL;
+		notif->icon_initialized = false;
+	}
+	if (notif->style.icons && !notif->icon_initialized) {
+		notif->icon = create_icon(notif);
+		notif->icon_initialized = true;
+	}
+	return true;
+}
+
 void reset_notification(struct mako_notification *notif) {
 	struct mako_action *action, *tmp;
 	wl_list_for_each_safe(action, tmp, &notif->actions, link) {
@@ -44,6 +82,7 @@ void reset_notification(struct mako_notification *notif) {
 
 	free(notif->app_name);
 	free(notif->app_icon);
+	free(notif->original_app_icon);
 	free(notif->summary);
 	free(notif->body);
 	free(notif->category);
@@ -56,6 +95,7 @@ void reset_notification(struct mako_notification *notif) {
 
 	notif->app_name = strdup("");
 	notif->app_icon = strdup("");
+	notif->original_app_icon = NULL;
 	notif->summary = strdup("");
 	notif->body = strdup("");
 	notif->category = strdup("");
@@ -64,8 +104,13 @@ void reset_notification(struct mako_notification *notif) {
 
 	notif->image_data = NULL;
 
+	free(notif->style.app_icon);
+	notif->style.app_icon = NULL;
+	notif->style.spec.app_icon = false;
+
 	destroy_icon(notif->icon);
 	notif->icon = NULL;
+	notif->icon_initialized = false;
 }
 
 struct mako_notification *create_notification(struct mako_state *state) {
@@ -96,6 +141,7 @@ void destroy_notification(struct mako_notification *notif) {
 
 	free(notif->app_name);
 	free(notif->app_icon);
+	free(notif->original_app_icon);
 	free(notif->summary);
 	free(notif->body);
 	free(notif->category);

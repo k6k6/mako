@@ -21,6 +21,8 @@ _mako()
     '--border-radius'
     '--progress-color'
     '--icons'
+    '--app-icon'
+    '--icon'
     '--icon-path'
     '--max-icon-size'
     '--icon-border-radius'
@@ -40,7 +42,7 @@ _mako()
   )
 
   case $prev in
-    -c|--config)
+    -c|--config|--app-icon|--icon)
       COMPREPLY=($(compgen -f -- "$cur"))
       return
       ;;
